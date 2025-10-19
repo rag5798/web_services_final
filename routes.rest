@@ -1,17 +1,14 @@
-### Choose active host
-@host = http://localhost:3000/api
-
-### Item id to reuse in tests (set after POST)
+### Item id to reuse in tests
 @item_id = 000000000000000000000000
 
 ### ---------------------------------------------------
 ### List all items
-GET {{host}}/items
+GET http://localhost:3000/api/items
 Accept: application/json
 
 ### Create a new item
 # @name create_item
-POST {{host}}/items
+POST http://localhost:3000/api/items
 Content-Type: application/json
 Accept: application/json
 
@@ -24,11 +21,11 @@ Accept: application/json
 @item_id = {{create_item.response.body.$.data._id}}
 
 ### Get created item by ID
-GET {{host}}/items/{{item_id}}
+GET http://localhost:3000/api/items/{{item_id}}
 Accept: application/json
 
 ### Update created item
-PUT {{host}}/items/{{item_id}}
+PUT http://localhost:3000/api/items/{{item_id}}
 Content-Type: application/json
 Accept: application/json
 
@@ -38,24 +35,21 @@ Accept: application/json
 }
 
 ### Delete created item
-DELETE {{host}}/items/{{item_id}}
+DELETE http://localhost:3000/api/items/{{item_id}}
 Accept: application/json
 
-### Render Routes
-### Choose active host
-@host = https://web-services-final.onrender.com/api
-
-### Item id to reuse in tests (set after POST)
+### Render Routes ---------------------------------------------------
+### Item id to reuse in tests
 @item_id = 000000000000000000000000
 
 ### ---------------------------------------------------
 ### List all items
-GET {{host}}/items
+GET https://web-services-final.onrender.com/api/items
 Accept: application/json
 
 ### Create a new item
 # @name create_item
-POST {{host}}/items
+POST https://web-services-final.onrender.com/api/items
 Content-Type: application/json
 Accept: application/json
 
@@ -68,11 +62,11 @@ Accept: application/json
 @item_id = {{create_item.response.body.$.data._id}}
 
 ### Get created item by ID
-GET {{host}}/items/{{item_id}}
+GET https://web-services-final.onrender.com/api/items/{{item_id}}
 Accept: application/json
 
 ### Update created item
-PUT {{host}}/items/{{item_id}}
+PUT https://web-services-final.onrender.com/api/items/{{item_id}}
 Content-Type: application/json
 Accept: application/json
 
@@ -82,5 +76,5 @@ Accept: application/json
 }
 
 ### Delete created item
-DELETE {{host}}/items/{{item_id}}
+DELETE https://web-services-final.onrender.com/api/items/{{item_id}}
 Accept: application/json

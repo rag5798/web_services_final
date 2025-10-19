@@ -14,10 +14,10 @@ const app = express();
 
 // SECURITY
 app.use(helmet());
-app.set('trust proxy', 1); // needed on Render for accurate IPs
+app.set('trust proxy', 1);
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300 })); // 300 req/15min per IP
 
-// CORS (lock down in prod)
+// CORS
 app.use(cors());
 
 app.use(express.json({ limit: '1mb' }));
