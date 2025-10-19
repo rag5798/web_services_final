@@ -8,8 +8,8 @@ const endpointsFiles = ['./routers/index.js'];
 const doc = {
   info: { title: 'Storefront API', version: '1.0.0', description: 'Items CRUD API' },
   servers: [
-    // 👇 IMPORTANT: include /api here so Try it Out calls /api/items, etc.
     { url: `http://localhost:${process.env.PORT || 3000}/api`, description: 'Local' },
+    { url: 'https://web-services-final.onrender.com/api', description: 'Render (prod)' }
   ],
   tags: [{ name: 'Items' }],
   components: {

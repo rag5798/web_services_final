@@ -9,6 +9,10 @@
     {
       "url": "http://localhost:3000/api",
       "description": "Local"
+    },
+    {
+      "url": "https://web-services-final.onrender.com/api",
+      "description": "Render (prod)"
     }
   ],
   "tags": [
