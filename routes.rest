@@ -1,0 +1,86 @@
+### Choose active host
+@host = http://localhost:3000/api
+
+### Item id to reuse in tests (set after POST)
+@item_id = 000000000000000000000000
+
+### ---------------------------------------------------
+### List all items
+GET {{host}}/items
+Accept: application/json
+
+### Create a new item
+# @name create_item
+POST {{host}}/items
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test Widget",
+  "price": 42
+}
+
+### Capture id from last response
+@item_id = {{create_item.response.body.$.data._id}}
+
+### Get created item by ID
+GET {{host}}/items/{{item_id}}
+Accept: application/json
+
+### Update created item
+PUT {{host}}/items/{{item_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Updated Widget",
+  "price": 99
+}
+
+### Delete created item
+DELETE {{host}}/items/{{item_id}}
+Accept: application/json
+
+### Render Routes
+### Choose active host
+@host = https://web-services-final.onrender.com/api
+
+### Item id to reuse in tests (set after POST)
+@item_id = 000000000000000000000000
+
+### ---------------------------------------------------
+### List all items
+GET {{host}}/items
+Accept: application/json
+
+### Create a new item
+# @name create_item
+POST {{host}}/items
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test Widget",
+  "price": 42
+}
+
+### Capture id from last response
+@item_id = {{create_item.response.body.$.data._id}}
+
+### Get created item by ID
+GET {{host}}/items/{{item_id}}
+Accept: application/json
+
+### Update created item
+PUT {{host}}/items/{{item_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Updated Widget",
+  "price": 99
+}
+
+### Delete created item
+DELETE {{host}}/items/{{item_id}}
+Accept: application/json
