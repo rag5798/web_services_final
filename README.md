@@ -1,5 +1,8 @@
 # REST API Service
 
+**Live demo:** [web-services-final.onrender.com](https://web-services-final.onrender.com) · [Interactive API docs](https://web-services-final.onrender.com/api-docs)
+*(Hosted on Render's free tier — the first load after idle can take up to a minute.)*
+
 A secured RESTful API built with Node.js, Express, and MongoDB. It supports full CRUD operations on a protected resource, token- and session-based authentication, Google OAuth 2.0 sign-in, and interactive API documentation via Swagger.
 
 This project was built to practice designing a production-minded backend: not just routes and a database, but the layers around them — authentication, input validation, security headers, rate limiting, and documented endpoints.
