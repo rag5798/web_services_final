@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Items API Client</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --panel: #ffffff;
+    --border: #dfe3e8;
+    --text: #1c1f24;
+    --muted: #6b7280;
+    --accent: #2f6fed;
+    --accent-hover: #2358c4;
+    --danger: #d64545;
+    --danger-hover: #b93838;
+    --ok: #1c9c5a;
+    --bad: #d64545;
+    --mono-bg: #0f1115;
+    --mono-text: #d9e0ea;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+  }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 0.9rem; }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+  }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+  label { font-size: 0.82rem; color: var(--muted); display: block; margin-bottom: 4px; }
+
+  select, input, button {
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 8px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+  }
+
+  button {
+    cursor: pointer;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  button:hover { background: var(--accent-hover); }
+  button.secondary { background: #fff; color: var(--text); border-color: var(--border); font-weight: 500; }
+  button.secondary:hover { background: #f0f1f3; }
+  button.danger { background: var(--danger); border-color: var(--danger); }
+  button.danger:hover { background: var(--danger-hover); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .status-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 6px; background: #999; }
+  .status-dot.ok { background: var(--ok); }
+  .status-dot.bad { background: var(--bad); }
+  #healthText { font-size: 0.88rem; color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  td.actions { display: flex; gap: 6px; }
+  td.actions button { padding: 5px 9px; font-size: 0.8rem; }
+  tr.editing td { background: #f7f9ff; }
+  .empty { color: var(--muted); padding: 14px 4px; font-size: 0.9rem; }
+
+  form#addForm { gap: 10px; }
+  form#addForm input[type=text], form#addForm input[type=number] { flex: 1; min-width: 140px; }
+
+  pre#log {
+    background: var(--mono-bg);
+    color: var(--mono-text);
+    padding: 12px 14px;
+    border-radius: 8px;
+    max-height: 220px;
+    overflow: auto;
+    font-size: 0.78rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+  }
+
+  .section-title { font-size: 0.95rem; font-weight: 600; margin: 0 0 10px; }
+</style>
+</head>
+<body>
+
+<h1>Items API Client</h1>
+<div class="panel row">
+  <div>
+    <label for="envSelect">Environment</label>
+    <select id="envSelect">
+      <option value="auto" selected>Auto — this server (<span id="autoOriginLabel"></span>)</option>
+      <option value="http://localhost:3000">Local — http://localhost:3000</option>
+      <option value="https://web-services-final.onrender.com">Render — web-services-final.onrender.com</option>
+      <option value="custom">Custom URL…</option>
+    </select>
+  </div>
+  <div id="customUrlWrap" style="display:none;">
+    <label for="customUrl">Base URL</label>
+    <input type="text" id="customUrl" placeholder="https://example.com" />
+  </div>
+  <div>
+    <label>&nbsp;</label>
+    <button id="checkHealth" class="secondary" type="button">Check connection</button>
+  </div>
+  <div style="margin-left:auto; align-self:flex-end; padding-bottom:8px;">
+    <span class="status-dot" id="statusDot"></span><span id="healthText">Not checked yet</span>
+  </div>
+</div>
+
+<div class="panel">
+  <p class="section-title">Add item</p>
+  <form id="addForm" class="row">
+    <input type="text" id="newName" placeholder="Name" required />
+    <input type="number" id="newPrice" placeholder="Price" step="0.01" required />
+    <button type="submit">Create</button>
+  </form>
+</div>
+
+<div class="panel">
+  <div class="row" style="justify-content: space-between; margin-bottom: 10px;">
+    <p class="section-title" style="margin:0;">Items</p>
+    <button id="refreshBtn" class="secondary" type="button">Refresh</button>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Price</th><th>Created</th><th style="width:150px;">Actions</th></tr>
+    </thead>
+    <tbody id="itemsBody"></tbody>
+  </table>
+  <div id="emptyMsg" class="empty" style="display:none;">No items yet — add one above.</div>
+</div>
+
+<div class="panel">
+  <p class="section-title">Request log</p>
+  <pre id="log">Ready.</pre>
+</div>
+
+<script defer src="app.js"></script>
+</body>
+</html>

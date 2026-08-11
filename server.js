@@ -1,5 +1,6 @@
 // server.js
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -13,7 +14,9 @@ const apiRouter = require('./routers/index');
 const app = express();
 
 // SECURITY
-app.use(helmet());
+// crossOriginResourcePolicy defaults to 'same-origin', which silently blocks
+// browser fetch() calls from other origins even though cors() below allows them.
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.set('trust proxy', 1);
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300 })); // 300 req/15min per IP
 
@@ -26,8 +29,11 @@ app.use(morgan('dev'));
 // Swagger UI (reads generated JSON)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc, { explorer: true }));
 
-app.get('/', (_req, res) => res.json({ ok: true, message: 'API is up' }));
 app.get('/health', (_req, res) => res.status(200).send('ok'));
+
+// Static client (public/index.html) — served at '/' so the same deployed
+// origin (local or Render) doubles as the API and its test UI.
+app.use(express.static(path.join(__dirname, 'public')));
 
 // API
 app.use('/api', apiRouter);
