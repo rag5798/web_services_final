@@ -2,6 +2,7 @@
 const express = require('express');
 const { ObjectId } = require('mongodb');
 const { getCollection } = require('../database/index');
+const requireAuth = require('../middleware/requireAuth');
 
 const router = express.Router();
 const coll = () => getCollection('items');
@@ -48,7 +49,7 @@ router.get('/items/:id', async (req, res, next) => {
 });
 
 // POST /api/items
-router.post('/items', async (req, res, next) => {
+router.post('/items', requireAuth, async (req, res, next) => {
   /* #swagger.tags = ['Items']
      #swagger.summary = 'Create item'
      #swagger.requestBody = {
@@ -75,7 +76,7 @@ router.post('/items', async (req, res, next) => {
 });
 
 // PUT /api/items/:id
-router.put('/items/:id', async (req, res, next) => {
+router.put('/items/:id', requireAuth, async (req, res, next) => {
   /* #swagger.tags = ['Items']
      #swagger.summary = 'Replace an item (full update)'
      #swagger.parameters['id'] = { $ref: '#/components/parameters/MongoId' }
@@ -109,7 +110,7 @@ router.put('/items/:id', async (req, res, next) => {
 });
 
 // DELETE /api/items/:id
-router.delete('/items/:id', async (req, res, next) => {
+router.delete('/items/:id', requireAuth, async (req, res, next) => {
   /* #swagger.tags = ['Items']
      #swagger.summary = 'Delete item'
      #swagger.parameters['id'] = { $ref: '#/components/parameters/MongoId' }

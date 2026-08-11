@@ -7,26 +7,68 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDoc = require('./docs/swagger.json');     // ← generated file
+const swaggerDoc = require('./docs/swagger.json');
 const { connect } = require('./database/index');
 const apiRouter = require('./routers/index');
+const authRouter = require('./routers/auth');
+const oauthRouter = require('./routers/oauth');
+
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const passport = require('passport');
+require('./config/passport');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 // SECURITY
 // crossOriginResourcePolicy defaults to 'same-origin', which silently blocks
 // browser fetch() calls from other origins even though cors() below allows them.
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.set('trust proxy', 1);
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300 })); // 300 req/15min per IP
 
-// CORS
+// --- sessions (for OAuth) ---
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: 'sessions',
+      ttl: 60 * 60 * 24 * 7, // 7 days
+    }),
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: 'lax',
+    },
+  })
+);
+
+// passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// security
+app.use(helmet());
+
+// rate limit
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 300,
+  })
+);
+
+// CORS (you can tighten this later)
 app.use(cors());
 
+// body + logging
 app.use(express.json({ limit: '1mb' }));
 app.use(morgan('dev'));
 
-// Swagger UI (reads generated JSON)
+// swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc, { explorer: true }));
 
 app.get('/health', (_req, res) => res.status(200).send('ok'));
@@ -37,18 +79,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // API
 app.use('/api', apiRouter);
+app.use('/api', authRouter);
+app.use('/api', oauthRouter);
 
-// 404 & errors
+// 404
 app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
+
+// error handler
 app.use((err, _req, res, _next) => {
   console.error(err);
   const status = err.status || 500;
   res.status(status).json({ status, error: err.message || 'Server error' });
 });
 
-
-const PORT = process.env.PORT || 3000;
-
+// start
 (async () => {
   try {
     await connect();
